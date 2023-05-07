@@ -15,24 +15,17 @@ public class Rivers : MonoBehaviour {
              int y = UnityEngine.Random.Range(1, heightMap.GetLength(1) - 1);
 
             // losowanie zrodla rzeki az do momentu gdy wylosuje sie ono w gorach
-            while (heightMap[x, y] < 0.62f) {    
+            int counter = 0;
+            while (heightMap[x, y] < 0.62f && counter<100) {    
                 x = UnityEngine.Random.Range(1, heightMap.GetLength(0) - 1);
                 y = UnityEngine.Random.Range(1, heightMap.GetLength(1) - 1);
+                counter++;
               }
 
-           
-
-            //aktualnie zapobiegam wyboru punktow na samych rogach mapy
-            /*if (x == 0 || x == 254 || y == 0 || y == 254) {
-                break;
+            if(counter == 100) {
+                return riverMap;
             }
 
-
-            RiverPoint lowestNeigh = calcLowestNeigh(x, y, heightMap, riverMap);
-            x = lowestNeigh.x;
-            y = lowestNeigh.y;
-            riverMap[x, y] = true;
-            */
 
 
             for (int j = 0; j < riverLength; j++) {
@@ -92,8 +85,9 @@ public class Rivers : MonoBehaviour {
         }
 
         if (lowestNeigh.height > heightMap[x,y]) {
-            heightMap[lowestNeigh.x, lowestNeigh.y] = heightMap[x, y] - 0.001f;  // stala wartosc o jaka jest zmniejszana wysokosc najnizszego punktu
-           // lowestNeigh = BFS(lowestNeigh, riverMap); 
+              heightMap[lowestNeigh.x, lowestNeigh.y] = heightMap[x, y] - 0.001f;  // stala wartosc o jaka jest zmniejszana wysokosc najnizszego punktu
+            // lowestNeigh = BFS(lowestNeigh, riverMap); 
+           // return null;
         }        
 
         return lowestNeigh;
