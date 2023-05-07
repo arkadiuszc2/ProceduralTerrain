@@ -4,7 +4,7 @@ using UnityEngine;
 public class MapDisplay : MonoBehaviour {
     public Renderer textureRender;
 
-    public void DrawNoiseMap(float[,] noiseMap, bool rivers, bool[,] riversMap, float[,] moistureMap, float[,] temperatureMap) {
+    public void DrawNoiseMap(float[,] noiseMap, bool onlyHeightsMap, bool rivers, bool[,] riversMap, float[,] moistureMap, float[,] temperatureMap) {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
 
@@ -13,10 +13,18 @@ public class MapDisplay : MonoBehaviour {
         Color[] colorMap = new Color[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                if (rivers == true) {
-                    colorMap[y * width + x] = checkColor(noiseMap[x, y], riversMap[x, y], moistureMap[x, y], temperatureMap[x, y]);
+                if (onlyHeightsMap != true) {
+                    if (rivers == true) {
+                        colorMap[y * width + x] = checkColor(noiseMap[x, y], riversMap[x, y], moistureMap[x, y], temperatureMap[x, y]);
+                    } else {
+                        colorMap[y * width + x] = checkColor(noiseMap[x, y], false, moistureMap[x, y], temperatureMap[x, y]);
+                    }
                 } else {
-                    colorMap[y * width + x] = checkColor(noiseMap[x, y], false, moistureMap[x, y], temperatureMap[x, y]);
+                    if (riversMap[x,y] == true) {
+                        colorMap[y * width + x] = Color.blue;
+                    } else {
+                        colorMap[y * width + x] = Color.Lerp(Color.black, Color.white, noiseMap[x, y]);
+                    }
                 }
             }
         }
@@ -55,7 +63,7 @@ public class MapDisplay : MonoBehaviour {
         } else if (biom == Biomes.Savanna) {
             return new Color(0.8f, 0.4f, 0.0f);
         } else if (biom == Biomes.TropicalForest) {
-            return new Color(0.6f, 1.0f, 0.2f );
+            return new Color(0.6f, 1.0f, 0.2f);
         } else {
             return Color.black;
         }

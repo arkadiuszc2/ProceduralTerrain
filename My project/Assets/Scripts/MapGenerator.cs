@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
+    public bool onlyHeightsMap;
     public int mapWidth;
     public int mapHeight;
     public float noiseScale;
@@ -34,6 +35,6 @@ public class MapGenerator : MonoBehaviour {
         float[,] moistureMap = Noise.GenerateMoistureMap(mapWidth, mapHeight, noiseScale, mtOctaves, mtPersistance, mtLacunarity, xOffset, yOffset, mtFirstOctaveFreq);
         float[,] temperatureMap = Noise.GenerateMoistureMap(mapWidth, mapHeight, noiseScale, tempOctaves, tempPersistance, tempLacunarity, xOffset, yOffset, tempFirstOctaveFreq);
         MapDisplay display = FindObjectOfType<MapDisplay>();
-        display.DrawNoiseMap(elevationMap, rivers, riversMap, moistureMap, temperatureMap);
+        display.DrawNoiseMap(elevationMap, onlyHeightsMap, rivers, riversMap, moistureMap, temperatureMap);
     }
 }
