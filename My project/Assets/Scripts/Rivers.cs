@@ -17,15 +17,15 @@ public class Rivers : MonoBehaviour {
 
             // losowanie zrodla rzeki az do momentu gdy wylosuje sie ono w gorach
             int counter = 0;
-            while (heightMap[startX, startY] < 0.62f && counter < 100) {
-                //!isFarEnoughFromOtherStartPoint(riversStartPoints, startX, startY) 
+            while ((heightMap[startX, startY] < 0.62f && counter < 100) || !isFarEnoughFromOtherStartPoint(riversStartPoints, startX, startY)) { 
+
                 startX = UnityEngine.Random.Range(1, heightMap.GetLength(0) - 1);
                 startY = UnityEngine.Random.Range(1, heightMap.GetLength(1) - 1);
                 counter++;
             }
 
             //zabezpieczenie w wypadku nie znalezienia punktu o wysokosci > 0.62f
-            if (counter == 100) {
+            if (counter == 1000) {
                 return riverMap;
             }
 
@@ -111,8 +111,8 @@ public class Rivers : MonoBehaviour {
 
         List<RiverPoint> riverPoints = new List<RiverPoint>();
         RiverPoint validatedPoint = currentNode;
-        riverPoints.Add(validatedPoint);
-        while (validatedPoint.parent!=null) {
+        //riverPoints.Add(validatedPoint);
+        while (validatedPoint.parent!=null ) {
             riverPoints.Add(validatedPoint.parent);
             validatedPoint = validatedPoint.parent;
         }
@@ -174,7 +174,7 @@ public class Rivers : MonoBehaviour {
 
     private static bool isFarEnoughFromOtherStartPoint(List<Point> startPoints, int startX, int startY) {
         foreach (Point point in startPoints) { 
-            if(Mathf.Abs(point.x - startX) < 4.0f || Mathf.Abs(point.y - startY) < 4.0f) {
+            if(Mathf.Abs(point.x - startX) < 10 && Mathf.Abs(point.y - startY) < 10) {
                 return false;
             }
         }
