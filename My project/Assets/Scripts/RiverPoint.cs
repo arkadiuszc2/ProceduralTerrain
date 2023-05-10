@@ -16,7 +16,7 @@ public class RiverPoint
         this.y = y;
         this.height = height;
         this.distToEnd = distToEnd;
-        this.fCost = height + distToEnd;
+        this.fCost = height*10000 + distToEnd;
         this.parent = parent;
     }
 

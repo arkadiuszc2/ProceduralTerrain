@@ -6,6 +6,7 @@ public class Rivers : MonoBehaviour {
     public static bool[,] GenerateRiversMap(float[,] heightMap, int numRivers, int riverLength) {
         bool[,] riverMap = new bool[heightMap.GetLength(0), heightMap.GetLength(1)];
 
+        List<Point> riversStartPoints = new List<Point>(); 
 
         for (int i = 0; i < numRivers; i++) {
 
@@ -17,6 +18,7 @@ public class Rivers : MonoBehaviour {
             // losowanie zrodla rzeki az do momentu gdy wylosuje sie ono w gorach
             int counter = 0;
             while (heightMap[startX, startY] < 0.62f && counter < 100) {
+                //!isFarEnoughFromOtherStartPoint(riversStartPoints, startX, startY) 
                 startX = UnityEngine.Random.Range(1, heightMap.GetLength(0) - 1);
                 startY = UnityEngine.Random.Range(1, heightMap.GetLength(1) - 1);
                 counter++;
@@ -26,6 +28,8 @@ public class Rivers : MonoBehaviour {
             if (counter == 100) {
                 return riverMap;
             }
+
+            riversStartPoints.Add(new Point(startX, startY));
 
             RiverPoint startPoint = new RiverPoint(startX, startY, heightMap[startX, startY], 0.0f, null);
 
@@ -48,7 +52,7 @@ public class Rivers : MonoBehaviour {
 
             RiverPoint endPoint = new RiverPoint(endX, endY, heightMap[endX, endY], 0.0f, null);
 
-            List<RiverPoint> riverPoints = aStarPathFinder(startPoint, endPoint, heightMap);
+            List<RiverPoint> riverPoints = aStarPathFinder(startPoint, endPoint, heightMap, riverMap);
             
             foreach (RiverPoint point in riverPoints) {
                 riverMap[point.x, point.y] = true;
@@ -58,7 +62,7 @@ public class Rivers : MonoBehaviour {
         return riverMap;
     }
     //moja implementacja algorytmu Astar zmodyfikowanego aby znajdowal sciezke dla rzeki
-    private static List<RiverPoint> aStarPathFinder(RiverPoint startPoint, RiverPoint endPoint, float[,] heightMap) {
+    private static List<RiverPoint> aStarPathFinder(RiverPoint startPoint, RiverPoint endPoint, float[,] heightMap, bool[,] riverMap) {
         List<RiverPoint> openList = new List<RiverPoint>();
         HashSet<RiverPoint> closedSet = new HashSet<RiverPoint>();
 
@@ -66,10 +70,17 @@ public class Rivers : MonoBehaviour {
 
         // inicjalizacja rozpatrywanego aktualnie punktu
         RiverPoint currentNode = null;
-
+        float currentMinRiverHeight = 0.0f;
         while (openList.Count > 0) {
             openList.Sort(new RiverPointsComparer());
             currentNode = openList[0];
+            //set new max riverpoint height, used to validate downhill flow of the river
+            
+
+            if (isRiverInSea(currentNode) || isRiverInOtherRiver(currentNode, riverMap)) {
+                break;
+            }
+            Debug.Log("CurrentNode" + "x: " + currentNode.x + " y: " + currentNode.y + " height: " + currentNode.height +" distEnd: " + currentNode.distToEnd);
             closedSet.Add(currentNode);
             openList.Remove(currentNode);
 
@@ -80,7 +91,8 @@ public class Rivers : MonoBehaviour {
             List<RiverPoint> neighboursList = createNeighboursList(currentNode, heightMap, endPoint);
 
             foreach (RiverPoint neighbor in neighboursList) {
-                if (closedSet.Contains(neighbor)) {
+                Debug.Log("Neighbor" + "x: " + neighbor.x + " y: " + neighbor.y + " height: " + neighbor.height + " distToEnd: " + neighbor.distToEnd);
+                if (closedSet.Contains(neighbor)) {//isPointWalkable(neighbor,)==false
                     continue;
                 }
                 if (openList.Contains(neighbor) == true) {
@@ -139,7 +151,7 @@ public class Rivers : MonoBehaviour {
         int endY = endpoint.y;
         float dist = 0;
 
-        dist = Mathf.Sqrt(Mathf.Pow(2, endX - x) + Mathf.Pow(2, endY - y));
+        dist = Mathf.Sqrt(Mathf.Pow(endX - x, 2) + Mathf.Pow(endY - y,2));
         return dist;
     }
 
@@ -150,6 +162,23 @@ public class Rivers : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    private static bool isRiverInSea(RiverPoint currentNode) {
+        return currentNode.height < 0.39f;
+    }
+
+    private static bool isRiverInOtherRiver(RiverPoint currentNode, bool[,] riverMap) {
+        return riverMap[currentNode.x, currentNode.y]==true;
+    }
+
+    private static bool isFarEnoughFromOtherStartPoint(List<Point> startPoints, int startX, int startY) {
+        foreach (Point point in startPoints) { 
+            if(Mathf.Abs(point.x - startX) < 4.0f || Mathf.Abs(point.y - startY) < 4.0f) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
