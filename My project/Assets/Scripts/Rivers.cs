@@ -17,7 +17,7 @@ public class Rivers : MonoBehaviour {
 
             // losowanie zrodla rzeki az do momentu gdy wylosuje sie ono w gorach
             int counter = 0;
-            while ((heightMap[startX, startY] < 0.62f && counter < 100) || !isFarEnoughFromOtherStartPoint(riversStartPoints, startX, startY)) { 
+            while ((heightMap[startX, startY] < 0.52f && counter < 100) || !isFarEnoughFromOtherStartPoint(riversStartPoints, startX, startY)) { // bazowo <0.62
 
                 startX = UnityEngine.Random.Range(1, heightMap.GetLength(0) - 1);
                 startY = UnityEngine.Random.Range(1, heightMap.GetLength(1) - 1);
@@ -113,7 +113,7 @@ public class Rivers : MonoBehaviour {
         RiverPoint validatedPoint = currentNode;
         //riverPoints.Add(validatedPoint);
         while (validatedPoint.parent!=null ) {
-            riverPoints.Add(validatedPoint.parent);
+            riverPoints.Add(validatedPoint);
             validatedPoint = validatedPoint.parent;
         }
 
