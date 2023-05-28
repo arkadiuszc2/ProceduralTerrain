@@ -28,6 +28,8 @@ public class MapDisplay : MonoBehaviour {
                 }
             }
         }
+        texture.filterMode = FilterMode.Point;
+        texture.wrapMode = TextureWrapMode.Clamp;
         texture.SetPixels(colorMap);
         texture.Apply();
 

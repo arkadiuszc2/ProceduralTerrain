@@ -80,7 +80,7 @@ public class Rivers : MonoBehaviour {
             if (isRiverInSea(currentNode) || isRiverInOtherRiver(currentNode, riverMap)) {
                 break;
             }
-            Debug.Log("CurrentNode" + "x: " + currentNode.x + " y: " + currentNode.y + " height: " + currentNode.height +" distEnd: " + currentNode.distToEnd);
+           // Debug.Log("CurrentNode" + "x: " + currentNode.x + " y: " + currentNode.y + " height: " + currentNode.height +" distEnd: " + currentNode.distToEnd);
             closedSet.Add(currentNode);
             openList.Remove(currentNode);
 
@@ -91,7 +91,7 @@ public class Rivers : MonoBehaviour {
             List<RiverPoint> neighboursList = createNeighboursList(currentNode, heightMap, endPoint);
 
             foreach (RiverPoint neighbor in neighboursList) {
-                Debug.Log("Neighbor" + "x: " + neighbor.x + " y: " + neighbor.y + " height: " + neighbor.height + " distToEnd: " + neighbor.distToEnd);
+                //Debug.Log("Neighbor" + "x: " + neighbor.x + " y: " + neighbor.y + " height: " + neighbor.height + " distToEnd: " + neighbor.distToEnd);
                 if (closedSet.Contains(neighbor)) {//isPointWalkable(neighbor,)==false
                     continue;
                 }
@@ -114,6 +114,13 @@ public class Rivers : MonoBehaviour {
         //riverPoints.Add(validatedPoint);
         while (validatedPoint.parent!=null ) {
             riverPoints.Add(validatedPoint);
+            if(validatedPoint.parent.height <= validatedPoint.height) {
+                validatedPoint.height = validatedPoint.parent.height - 0.001f;
+            }
+           // Debug.Log("riverPoint height: " + validatedPoint.height + " neigh1: " + heightMap[validatedPoint.x,validatedPoint.y+1] + " neigh2: " + heightMap[validatedPoint.x+1,validatedPoint.y] + " neigh3: " + heightMap[validatedPoint.x, validatedPoint.y-1] + " neigh4: " + heightMap[validatedPoint.x-1, validatedPoint.y] );
+            
+
+
             validatedPoint = validatedPoint.parent;
         }
 
