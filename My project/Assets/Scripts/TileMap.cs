@@ -7,6 +7,8 @@ public class TileMap : MonoBehaviour
 {
     public Tilemap grid;
     public Tile grass;
+    public Tile grass1;
+    public Tile grass2;
     public GameObject player;
     int chunkSize = 16;
     int chunkVisibilityDist = 20;
@@ -17,9 +19,19 @@ public class TileMap : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for(int x = 0; x<5; x++) {
-            for(int y=0; y<5; y++) {
-                grid.SetTile(new Vector3Int(x,y,0), grass);
+        Tile tile = new Tile();
+        for(int x = 0; x<10; x++) {
+            for(int y=0; y<10; y++) {
+                float num = Random.Range(0, 3);
+             
+                if(num < 1) {
+                    tile = grass;
+                } else if(num < 2) {
+                    tile = grass1;
+                } else {
+                    tile = grass2;
+                }
+                grid.SetTile(new Vector3Int(x,y,0), tile);
             }
         }
 
@@ -36,7 +48,7 @@ public class TileMap : MonoBehaviour
         int currChunkXcoord = Mathf.RoundToInt(playerPos.x / chunkSize);
         int currChunkYcoord = Mathf.RoundToInt(playerPos.y / chunkSize);
 
-        for(int xOffset = -chunkVisibilityDistt; xOffset <= chunkVisibilityDist; xOffset++) {
+        for(int xOffset = -chunkVisibilityDist; xOffset <= chunkVisibilityDist; xOffset++) {
             for(int yOffset = -chunkVisibilityDist; yOffset<=chunkVisibilityDist; yOffset++) {
                 Vector2 generatedChunkCoord = new Vector2(currChunkXcoord + xOffset, currChunkYcoord + yOffset);
 
@@ -44,6 +56,7 @@ public class TileMap : MonoBehaviour
                     // wyswietl
                 }
                 else {
+                    Tile[,] tiles = new Tile[16, 16];
                     tiles = setTilesForChunk(generatedChunkCoord);
                     terrainChunksDict.Add(generatedChunkCoord, new TerrainChunk(generatedChunkCoord, tiles));
                     //dodaj nowy do slownika i wyswietl
@@ -59,10 +72,11 @@ public class TileMap : MonoBehaviour
                 chunkTiles[x, y] = checkTile();
             }
         }
+        return null; //TO DO
     }
 
     public TileMap checkTile() {
-
+        return null; //TO DO
     }
 
     public class TerrainChunk {
@@ -70,9 +84,9 @@ public class TileMap : MonoBehaviour
         private bool visibility;
         private Tile[,] tiles;
 
-        public TerrainChunk(Vector2 chunkCoord) {
+        public TerrainChunk(Vector2 chunkCoord, Tile[,] tiles) {
             generatedChunkCoord = chunkCoord;
-            tiles = setTiles(chunkCoord); //maybe unnecessary
+            tiles = tiles; //maybe unnecessary
         }
 
         public void setActive() {
