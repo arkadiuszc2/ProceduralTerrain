@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 120;
         player.transform.position = player.transform.position + new Vector3(0.5f, 0.5f, 0f);
     }
 
@@ -15,16 +16,16 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         if (Input.GetKey(KeyCode.W)) {
-            player.transform.position = player.transform.position + new Vector3(0f, 0.01f, 0f);
+            player.transform.position = player.transform.position + new Vector3(0f, 0.03f, 0f);
         }
         if (Input.GetKey(KeyCode.A)) {
-            player.transform.position = player.transform.position + new Vector3(-0.01f, 0f, 0f);
+            player.transform.position = player.transform.position + new Vector3(-0.03f, 0f, 0f);
         }
         if (Input.GetKey(KeyCode.S)) {
-            player.transform.position = player.transform.position + new Vector3(0f, -0.01f, 0f);
+            player.transform.position = player.transform.position + new Vector3(0f, -0.03f, 0f);
         }
         if (Input.GetKey(KeyCode.D)) {
-            player.transform.position = player.transform.position + new Vector3(0.01f, 0f, 0f);
+            player.transform.position = player.transform.position + new Vector3(0.03f, 0f, 0f);
         }
     }
 }

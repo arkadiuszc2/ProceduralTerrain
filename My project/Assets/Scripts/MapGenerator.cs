@@ -37,4 +37,5 @@ public class MapGenerator : MonoBehaviour {
         MapDisplay display = FindObjectOfType<MapDisplay>();
         display.DrawNoiseMap(elevationMap, onlyHeightsMap, rivers, riversMap, moistureMap, temperatureMap);
     }
+
 }

@@ -176,8 +176,8 @@ MonoBehaviour:
   firstOctaveFreq: 0.04
   islands: 0
   mountainChain: 0
-  xOffset: 537
-  yOffset: 46
+  xOffset: 0
+  yOffset: 0
   rivers: 1
   numOfRivers: 10
   riversLength: 500
