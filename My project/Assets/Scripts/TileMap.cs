@@ -23,7 +23,7 @@ public class TileMap : MonoBehaviour {
     int chunkSize = 8;
     int chunkVisibilityDist = 1; //player is able to see 1 chunk in every direction (and chunk on which he is currently standing)
     public Vector2 playerPos;
-    int mapSize = 16;  //meaning that one mam have 16x16 chunks
+    int mapSize = 32;  //meaning that one mam have 16x16 chunks
     int mapSizeInPixels = 255; //meaning size of creating map (elevation map, moistureMap etc. )
 
     public float[,] elevationMap;  //later delete this variables and put into currentMap
@@ -40,7 +40,7 @@ public class TileMap : MonoBehaviour {
     void Start() {
         player.transform.position = player.transform.position + new Vector3(128, 128, 0); //set player position on the middle of first chunk 
         generateMap(0, 0);
-        currentMap = new Map(new Vector2(0,0), elevationMap, riversMap, moistureMap, temperatureMap);
+        currentMap = new Map(new Vector2(0, 0), elevationMap, riversMap, moistureMap, temperatureMap);
         /* Tile tile = new Tile();
          for(int x = 0; x<10; x++) {
              for(int y=0; y<10; y++) {
@@ -69,8 +69,8 @@ public class TileMap : MonoBehaviour {
 
     public void generateMap(int xOffset, int yOffset) {
         //bool onlyHeightsMap;
-        int mapWidth = 255;
-        int mapHeight = 255;
+        int mapWidth = 256;
+        int mapHeight = 256;
         float noiseScale = 3f;
         int octaves = 6;
         float persistance = 0.5f;//
@@ -140,6 +140,7 @@ public class TileMap : MonoBehaviour {
                     Tile[,] tiles = new Tile[chunkSize, chunkSize];
 
                     if (chunkOutsideCurrentMapRange(currChunkXcoord, currChunkYcoord)) {
+                        Debug.Log("new map needed!");
                         int currMapXcoord = Mathf.FloorToInt(currChunkXcoord / mapSize); //0, 0.1 0.8 0.9 are still chunk 0,0 but 1 is chunk 1,1
                         int currMapYcoord = Mathf.FloorToInt(currChunkYcoord / mapSize);
                         Vector2 expectedMapCoords = new Vector2(currMapXcoord, currMapYcoord);
@@ -171,10 +172,10 @@ public class TileMap : MonoBehaviour {
     }
 
     private bool chunkOutsideCurrentMapRange(int xCoord, int yCoord) {
-        if(xCoord > currentMap.Coords.x*chunkSize + 7 || xCoord < currentMap.Coords.x * chunkSize) {
+        if (xCoord > currentMap.Coords.x * mapSize + (mapSize - 1) || xCoord < currentMap.Coords.x * mapSize) {
             return true;
         }
-        if (yCoord > currentMap.Coords.y * chunkSize + 7 || yCoord < currentMap.Coords.y * chunkSize) {
+        if (yCoord > currentMap.Coords.y * mapSize + (mapSize - 1) || yCoord < currentMap.Coords.y * mapSize) {
             return true;
         }
         return false;
@@ -185,132 +186,139 @@ public class TileMap : MonoBehaviour {
         Vector2 offsets = new Vector2();
 
         if (expectedMapCoords.x > currentMapCoords.x) { //czy na pewno mapsize-1?
-            offsets.y = 1;
+            offsets.x = currentMapCoords.x + 1;
+        } else if (Mathf.RoundToInt(expectedMapCoords.x) == Mathf.RoundToInt(currentMapCoords.x)) {
+            offsets.x = 0;
         } else {
-            offsets.y = -1;
+            offsets.x = currentMapCoords.x - 1;
         }
 
-        if (expectedMapCoords.y > currentMapCoords.y) {  //czy na pewno mapsize-1 ?
-            offsets.y = 1;
-        } else {
-            offsets.y = -1;
-        }
-
-        offsets.x = offsets.x * mapSizeInPixels;
-        offsets.y = offsets.y * mapSizeInPixels;
-
-        return offsets;
-
-    }
-
-
-
-    public Tile[,] generateTilesForChunk(Vector2 chunkCoord) {
-        Tile[,] chunkTiles = new Tile[chunkSize, chunkSize];
-        for (int x = 0; x < chunkSize; x++) {
-            for (int y = 0; y < chunkSize; y++) {
-                chunkTiles[x, y] = checkTile(chunkCoord, x, y);
+            if (expectedMapCoords.y > currentMapCoords.y) {  //czy na pewno mapsize-1 ?
+                offsets.y = currentMapCoords.y + 1;
+            } else if (Mathf.RoundToInt(expectedMapCoords.y) == Mathf.RoundToInt(currentMapCoords.y)) {
+                offsets.y = 0;
+            } else {
+                offsets.y = currentMapCoords.y - 1;
             }
-        }
-        return chunkTiles;
-    }
 
-    public Tile checkTile(Vector2 chunkCoord, int TileX, int TileY) {
-        
-        int chunkX = Mathf.RoundToInt(chunkCoord.x);   //why roundToInt? becouse basically vector2 storages floats
-        int chunkY = Mathf.RoundToInt(chunkCoord.y);
-        //int a = chunkSize * chunkX + TileX;
-        // int b = chunkSize * chunkY + TileY;
-        // Debug.Log("a: " + a + " b: " + b);
+            offsets.x = offsets.x * mapSizeInPixels;
+            offsets.y = offsets.y * mapSizeInPixels;
 
-        //fix coord according to currentMap (zeby nie probowalo wzic np. chunka (-1,0) bo nie ma takich wspolrzednych w tablicy)
-        //Vector2 fixedCoords = fixCoords(chunkX ,chunkX);
-        //chunkX = Mathf.RoundToInt(fixedCoords.x);   //przez ta czec kodu swiat sie generowal zle, chunki sie powtarzaly
-        //chunkY = Mathf.RoundToInt(fixedCoords.y);
-        Debug.Log(""+(chunkSize * chunkX + TileX) + " " + (chunkSize * chunkY + TileY));
-        float elevation = elevationMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
+            return offsets;
 
-        float temperature = temperatureMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
-        float moisture = moistureMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
-        bool isRiver = riversMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
-
-        if (isRiver == true) {
-            // return lakeTile;  //add lake tile to script
-            return grass; //for tests
         }
 
 
-        if (elevation < 0.3) {
-            return deepWater;           //for rendering tests
-                                    //  return depthTile;
-        } else if (elevation < 0.39) {
-            return water;
-            // return lakeTile;
-        } else if (elevation < 0.62) {
-            if (temperature < 0.39) {
-                if (moisture < 0.39) {
-                    //return snowTile;
+
+        public Tile[,] generateTilesForChunk(Vector2 chunkCoord) {
+            Tile[,] chunkTiles = new Tile[chunkSize, chunkSize];
+            for (int x = 0; x < chunkSize; x++) {
+                for (int y = 0; y < chunkSize; y++) {
+                    chunkTiles[x, y] = checkTile(chunkCoord, x, y);
+                }
+            }
+            return chunkTiles;
+        }
+
+        public Tile checkTile(Vector2 chunkCoord, int TileX, int TileY) {
+
+            int chunkX = Mathf.RoundToInt(chunkCoord.x);   //why roundToInt? becouse basically vector2 storages floats
+            int chunkY = Mathf.RoundToInt(chunkCoord.y);
+            //int a = chunkSize * chunkX + TileX;
+            // int b = chunkSize * chunkY + TileY;
+            // Debug.Log("a: " + a + " b: " + b);
+
+            //fix coord according to currentMap (zeby nie probowalo wzic np. chunka (-1,0) bo nie ma takich wspolrzednych w tablicy)
+            Vector2Int fixedCoords = fixCoords(chunkX, chunkY);
+            chunkX = fixedCoords.x;   //przez ta czec kodu swiat sie generowal zle, chunki sie powtarzaly
+            chunkY = fixedCoords.y;
+            Debug.Log("fx: " + fixedCoords.x + "fy: " + fixedCoords.y);
+            Debug.Log("" + (chunkSize * chunkX + TileX) + " " + (chunkSize * chunkY + TileY));
+            float elevation = elevationMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
+
+            float temperature = temperatureMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
+            float moisture = moistureMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
+            bool isRiver = riversMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
+
+            if (isRiver == true) {
+                // return lakeTile;  //add lake tile to script
+                return water; //for tests
+            }
+
+
+            if (elevation < 0.3) {
+                return deepWater;           //for rendering tests
+                                            //  return depthTile;
+            } else if (elevation < 0.39) {
+                return water;
+                // return lakeTile;
+            } else if (elevation < 0.62) {
+                if (temperature < 0.39) {
+                    if (moisture < 0.39) {
+                        //return snowTile;
+                        return snow;
+                    } else if (moisture < 0.49) {
+                        return tundra;
+                        //  return tundraTile;
+                    } else {
+                        return taiga;
+                        //   return taigaTile;
+                    }
+                } else if (temperature < 0.49) {
+                    if (moisture < 0.39) {
+                        return woodland;
+                        //  return woodlandTile;
+                    } else if (moisture < 0.49) {
+                        return grass;
+                        //  return grasslandTile;
+                    } else {
+                        return forest;
+                        // return forestTile;
+                    }
+                } else {
+                    if (moisture < 0.39) {
+                        return desert;
+                        //  return desertTile;
+                    } else if (moisture < 0.49) {
+                        return savanna;
+                        //   return savannaTile;
+                    } else {
+                        return jungle;
+                        //   return tropicalForestTile;
+                    }
+                }
+            } else {
+                if (temperature < 0.40) {
                     return snow;
-                } else if (moisture < 0.49) {
-                    return tundra;
-                    //  return tundraTile;
+                    //  return snowTile;
                 } else {
-                    return taiga;
-                    //   return taigaTile;
-                }
-            } else if (temperature < 0.49) {
-                if (moisture < 0.39) {
-                    return woodland;
-                    //  return woodlandTile;
-                } else if (moisture < 0.49) {
-                    return grass;
-                    //  return grasslandTile;
-                } else {
-                    return forest;
-                    // return forestTile;
-                }
-            } else {
-                if (moisture < 0.39) {
-                    return desert;
-                    //  return desertTile;
-                } else if (moisture < 0.49) {
-                    return savanna;
-                    //   return savannaTile;
-                } else {
-                    return jungle;
-                    //   return tropicalForestTile;
+                    return rocks;
+                    //  return rocksTile;
                 }
             }
-        } else {
-            if (temperature < 0.40) {
-                return snow;
-                //  return snowTile;
-            } else {
-                return rocks;
-                //  return rocksTile;
+
+            return grass; //maybe unnecessary: edit - when it was null sometimes null were generated so its little error around here
+        }
+
+        private Vector2Int fixCoords(int chunkX, int chunkY) {
+            Vector2Int fixedCoords = new Vector2Int();
+            //narazie nie obluguje ujemnych wspolrzednych chunków
+            if (chunkX >= 0) {
+                fixedCoords.x = chunkX % mapSize;
             }
+            /*else {
+                fixedCoords.x = mapSize + chunkX % mapSize;  //+ because ex -14%16 = -14 not 14
+            }*/
+
+            if (chunkY >= 0) {
+                fixedCoords.y = chunkY % mapSize;
+            }
+            /*else {
+                fixedCoords.y = mapSize + chunkY % mapSize;
+            }*/
+
+            return fixedCoords;
         }
-
-        return null; //maybe unnecessary
-    }
-
-    private Vector2 fixCoords(int chunkX, int chunkY) {
-        Vector2 fixedCoords = new Vector2();
-        //narazie nie obluguje ujemnych wspolrzednych chunków
-        if (chunkX >= 0) {
-            fixedCoords.x = chunkX % mapSize;
-        } else {
-            fixedCoords.x = mapSize + chunkX % mapSize;  //+ because ex -14%16 = -14 not 14
-        }
-
-        if (chunkY >= 0) {
-            fixedCoords.y = chunkY % mapSize;
-        } else {
-            fixedCoords.y = mapSize + chunkY % mapSize;
-        }
-
-        return fixedCoords;
-    }
 
     public class TerrainChunk {
         private Vector2 generatedChunkCoord;
