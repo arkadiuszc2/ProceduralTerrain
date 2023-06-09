@@ -5,9 +5,20 @@ using UnityEngine.Tilemaps;
 
 public class TileMap : MonoBehaviour {
     public Tilemap grid;
+    public Tile deepWater;
+    public Tile water;
+    public Tile tundra;
+    public Tile taiga;
+    public Tile woodland;
+    public Tile forest;
     public Tile grass;
-    public Tile grass1;
-    public Tile grass2;
+    public Tile rocks;
+    public Tile snow;
+    public Tile jungle;
+    public Tile savanna;
+    public Tile desert;
+
+
     public GameObject player;
     int chunkSize = 8;
     int chunkVisibilityDist = 1; //player is able to see 1 chunk in every direction (and chunk on which he is currently standing)
@@ -107,10 +118,10 @@ public class TileMap : MonoBehaviour {
             }
         }
 
-        for (int xOffset = -chunkVisibilityDist; xOffset <= chunkVisibilityDist; xOffset++) { //maybe increment by xOffset+chunkVisibilityDist
-            for (int yOffset = -chunkVisibilityDist; yOffset <= chunkVisibilityDist; yOffset++) {
-                Vector2 generatedChunkCoord = new Vector2(currChunkXcoord + xOffset, currChunkYcoord + yOffset);
-
+        for (int i = -1; i <= 1; i++) { //maybe increment by xOffset+chunkVisibilityDist
+            for (int j = -1; j <= 1; j++) {
+                Vector2 generatedChunkCoord = new Vector2(currChunkXcoord + i, currChunkYcoord + j);
+                //Debug.Log("koordy chunka: " + generatedChunkCoord);
                 if (terrainChunksDict.ContainsKey(generatedChunkCoord)) {
                     TerrainChunk terrainChunk;
                     terrainChunksDict.TryGetValue(generatedChunkCoord, out terrainChunk);
@@ -160,10 +171,10 @@ public class TileMap : MonoBehaviour {
     }
 
     private bool chunkOutsideCurrentMapRange(int xCoord, int yCoord) {
-        if(xCoord > currentMap.Coords.x*16 + 15 || xCoord < currentMap.Coords.x * 16) {
+        if(xCoord > currentMap.Coords.x*chunkSize + 7 || xCoord < currentMap.Coords.x * chunkSize) {
             return true;
         }
-        if (yCoord > currentMap.Coords.y * 16 + 15 || yCoord < currentMap.Coords.y * 16) {
+        if (yCoord > currentMap.Coords.y * chunkSize + 7 || yCoord < currentMap.Coords.y * chunkSize) {
             return true;
         }
         return false;
@@ -213,10 +224,10 @@ public class TileMap : MonoBehaviour {
         // Debug.Log("a: " + a + " b: " + b);
 
         //fix coord according to currentMap (zeby nie probowalo wzic np. chunka (-1,0) bo nie ma takich wspolrzednych w tablicy)
-        Vector2 fixedCoords = fixCoords(chunkX ,chunkX);
-        chunkX = Mathf.RoundToInt(fixedCoords.x);
-        chunkY = Mathf.RoundToInt(fixedCoords.y);
-
+        //Vector2 fixedCoords = fixCoords(chunkX ,chunkX);
+        //chunkX = Mathf.RoundToInt(fixedCoords.x);   //przez ta czec kodu swiat sie generowal zle, chunki sie powtarzaly
+        //chunkY = Mathf.RoundToInt(fixedCoords.y);
+        Debug.Log(""+(chunkSize * chunkX + TileX) + " " + (chunkSize * chunkY + TileY));
         float elevation = elevationMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
 
         float temperature = temperatureMap[chunkSize * chunkX + TileX, chunkSize * chunkY + TileY];
@@ -230,52 +241,52 @@ public class TileMap : MonoBehaviour {
 
 
         if (elevation < 0.3) {
-            return grass;           //for rendering tests
+            return deepWater;           //for rendering tests
                                     //  return depthTile;
         } else if (elevation < 0.39) {
-            return grass;
+            return water;
             // return lakeTile;
         } else if (elevation < 0.62) {
             if (temperature < 0.39) {
                 if (moisture < 0.39) {
                     //return snowTile;
-                    return grass;
+                    return snow;
                 } else if (moisture < 0.49) {
-                    return grass;
+                    return tundra;
                     //  return tundraTile;
                 } else {
-                    return grass;
+                    return taiga;
                     //   return taigaTile;
                 }
             } else if (temperature < 0.49) {
                 if (moisture < 0.39) {
-                    return grass;
+                    return woodland;
                     //  return woodlandTile;
                 } else if (moisture < 0.49) {
                     return grass;
                     //  return grasslandTile;
                 } else {
-                    return grass;
+                    return forest;
                     // return forestTile;
                 }
             } else {
                 if (moisture < 0.39) {
-                    return grass;
+                    return desert;
                     //  return desertTile;
                 } else if (moisture < 0.49) {
-                    return grass;
+                    return savanna;
                     //   return savannaTile;
                 } else {
-                    return grass;
+                    return jungle;
                     //   return tropicalForestTile;
                 }
             }
         } else {
             if (temperature < 0.40) {
-                return grass;
+                return snow;
                 //  return snowTile;
             } else {
-                return grass;
+                return rocks;
                 //  return rocksTile;
             }
         }

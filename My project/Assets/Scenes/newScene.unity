@@ -673,9 +673,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 1966843375}
+  deepWater: {fileID: 11400000, guid: cc9008214be18bb48b6e4da3ec7fa359, type: 2}
+  water: {fileID: 11400000, guid: bd22985d3a1657b408171ef0a1c4e6dd, type: 2}
+  tundra: {fileID: 11400000, guid: 2e0208e8fed341345ad4f2cad468c913, type: 2}
+  taiga: {fileID: 11400000, guid: 063656d7db825644fb269085e954667d, type: 2}
+  woodland: {fileID: 11400000, guid: 382fa3059b058ad439f9fd3c44708da1, type: 2}
+  forest: {fileID: 11400000, guid: 1b652756dd632b645a2a929179b061ea, type: 2}
   grass: {fileID: 11400000, guid: cbdd5baf0dffe994a889c31e1093a74c, type: 2}
-  grass1: {fileID: 11400000, guid: f2a8db5c70f43684fb7f97ab65c1e2b7, type: 2}
-  grass2: {fileID: 11400000, guid: 792b2ebfdb138d249a0c260014684416, type: 2}
+  rocks: {fileID: 11400000, guid: 6983db4476baec54db84172a94521411, type: 2}
+  snow: {fileID: 11400000, guid: d6f1c7081b976904c9c42b645d646eee, type: 2}
+  jungle: {fileID: 11400000, guid: 82f83243a406ca74288959fbfaec611c, type: 2}
+  savanna: {fileID: 11400000, guid: 51c301ed123c7584fbc60603e0783ce3, type: 2}
+  desert: {fileID: 0}
   player: {fileID: 211009836}
   playerPos: {x: 0, y: 0}
 --- !u!4 &1985604609
